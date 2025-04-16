@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CardCompact } from "@/components/card-compact";
+import { PaginatedData } from "@/components/pagination/types";
 import { Button } from "@/components/ui/button";
 import { getComments } from "../queries/get-comments";
 import { CommentWithMetadata } from "../types";
@@ -11,17 +12,7 @@ import { CommentItem } from "./comment-item";
 
 type CommentsProps = {
   ticketId: string;
-  paginatedComments: {
-    list: CommentWithMetadata[];
-    metadata: {
-      count: number;
-      hasNextPage: boolean;
-      cursor?: {
-        createdAt: number;
-        id: string;
-      };
-    };
-  };
+  paginatedComments: PaginatedData<CommentWithMetadata>;
 };
 
 const Comments = ({ ticketId, paginatedComments }: CommentsProps) => {
