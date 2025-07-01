@@ -6,19 +6,31 @@ type FormProps = {
   action: (payload: FormData) => void;
   actionState: ActionState;
   children: React.ReactNode;
+  onSuccess?: (actionState: ActionState) => void;
+  onError?: (actionState: ActionState) => void;
 };
 
-const Form = ({ action, actionState, children }: FormProps) => {
+const Form = ({
+  action,
+  actionState,
+  children,
+  onSuccess,
+  onError,
+}: FormProps) => {
+  // this will call the toast notification and reset the datepicker.
+  //the reason we are not doing it directly here is because it requires useEffect for checking if the actionState has changed
   useActionFeedback(actionState, {
     onSuccess: ({ actionState }) => {
       if (actionState.message) {
         toast.success(actionState.message);
       }
+      onSuccess?.(actionState);
     },
     onError: ({ actionState }) => {
       if (actionState.message) {
         toast.error(actionState.message);
       }
+      onError?.(actionState);
     },
   });
 
