@@ -1,3 +1,4 @@
+import { cloneElement, useActionState, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -7,17 +8,17 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "./ui/button";
-import { cloneElement, useState } from "react";
+import { Form } from "./form/form";
+import { SubmitButton } from "./form/submit-button";
+import { ActionState, EMPTY_ACTION_STATE } from "./form/utils/to-action-state";
 
 type UseConfirmDialogProps = {
   title?: string;
   description?: string;
   //ReactNode allows undefined, null too. So no need here
-  trigger: React.ReactElement<any>;
-  action: () => Promise<void>;
+  trigger: React.ReactElement<unknown>;
+  action: () => Promise<ActionState>;
 };
 
 const useConfirmDialog = ({
@@ -29,9 +30,14 @@ const useConfirmDialog = ({
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   // we need to make our own controlled component cause Dialog Trigger should be inside Dialog comp itself.
+ 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dialogTrigger = cloneElement(trigger as React.ReactElement<any>, {
     onClick: () => setIsOpen((state) => !state),
   });
+
+  // toast notification for delete comes from cookies not from useActionFeedback and the whole loop.
+  const [actionState, formAction] = useActionState(action, EMPTY_ACTION_STATE);
 
   const dialog = (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -48,9 +54,9 @@ const useConfirmDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction asChild>
-            <form action={action}>
-              <Button type="submit">Continue</Button>
-            </form>
+            <Form actionState={actionState} action={formAction}>
+              <SubmitButton label="Continue" />
+            </Form>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
